@@ -1,6 +1,8 @@
 /target/
 **/*.rs.bk
 Cargo.lock
+.direnv/
+.envrc
 
 tests/jenkins_test
 tests/Dockerfile
