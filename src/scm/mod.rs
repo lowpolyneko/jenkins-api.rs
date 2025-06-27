@@ -12,12 +12,16 @@ pub use self::browser::*;
 #[serde(rename_all = "camelCase")]
 pub struct MergeOptions {
     /// Merge strategy
+    #[allow(dead_code)]
     merge_strategy: String,
     /// Fast forward mode
+    #[allow(dead_code)]
     fast_forward_mode: String,
     /// Merge target
+    #[allow(dead_code)]
     merge_target: Option<String>,
     /// Remote branch
+    #[allow(dead_code)]
     remote_branch_name: Option<String>,
 }
 

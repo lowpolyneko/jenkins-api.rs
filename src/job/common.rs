@@ -96,9 +96,10 @@ where
         if let Path::Job { .. } = path {
             return Ok(jenkins_client.get(&path)?.json()?);
         } else if let Path::InFolder { path: sub_path, .. } = &path
-            && let Path::Job { .. } = sub_path.as_ref() {
-                return Ok(jenkins_client.get(&path)?.json()?);
-            }
+            && let Path::Job { .. } = sub_path.as_ref()
+        {
+            return Ok(jenkins_client.get(&path)?.json()?);
+        }
         Err(client::Error::InvalidUrl {
             url: self.url.clone(),
             expected: client::error::ExpectedType::Job,
@@ -438,6 +439,7 @@ macro_rules! job_buildable_with_common_fields_and_impl {
                 )*)*
                 private_fields {
                     /// Properties of the job
+                    #[allow(dead_code)]
                     property: Vec<CommonProperty>,
                 }
             }
