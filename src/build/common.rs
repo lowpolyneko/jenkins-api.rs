@@ -44,11 +44,10 @@ where
         let path = jenkins_client.url_to_path(&self.url);
         if let Path::Build { .. } = path {
             return Ok(jenkins_client.get(&path)?.json()?);
-        } else if let Path::InFolder { path: sub_path, .. } = &path {
-            if let Path::Build { .. } = sub_path.as_ref() {
+        } else if let Path::InFolder { path: sub_path, .. } = &path
+            && let Path::Build { .. } = sub_path.as_ref() {
                 return Ok(jenkins_client.get(&path)?.json()?);
             }
-        }
         Err(client::Error::InvalidUrl {
             url: self.url.clone(),
             expected: client::error::ExpectedType::Build,
@@ -193,8 +192,7 @@ pub trait Build {
             path: sub_path,
             folder_name,
         } = &path
-        {
-            if let Path::Build {
+            && let Path::Build {
                 job_name,
                 configuration,
                 ..
@@ -210,7 +208,6 @@ pub trait Build {
                     })?
                     .json()?);
             }
-        }
         Err(client::Error::InvalidUrl {
             url: self.url().to_string(),
             expected: client::error::ExpectedType::Build,
@@ -239,8 +236,7 @@ pub trait Build {
             path: sub_path,
             folder_name,
         } = &path
-        {
-            if let Path::Build {
+            && let Path::Build {
                 job_name,
                 number,
                 configuration,
@@ -255,7 +251,6 @@ pub trait Build {
                     })?
                     .text()?);
             }
-        }
 
         Err(client::Error::InvalidUrl {
             url: self.url().to_string(),

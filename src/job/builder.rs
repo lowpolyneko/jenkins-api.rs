@@ -45,8 +45,7 @@ impl<'a, 'b, 'c, 'd> JobBuilder<'a, 'b, 'c, 'd> {
             folder_name: _folder_name,
             path: sub_path,
         } = path
-        {
-            if let Path::Job {
+            && let Path::Job {
                 name,
                 configuration: None,
             } = sub_path.as_ref()
@@ -60,7 +59,6 @@ impl<'a, 'b, 'c, 'd> JobBuilder<'a, 'b, 'c, 'd> {
                     parameters: None,
                 });
             }
-        }
         Err(client::Error::InvalidUrl {
             url: job.url().to_string(),
             expected: client::error::ExpectedType::Job,

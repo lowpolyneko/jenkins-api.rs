@@ -5,13 +5,13 @@ use serde::{self, Deserialize, Serialize};
 use crate::helpers::Class;
 
 use super::JobBuilder;
+use crate::Jenkins;
 use crate::action::CommonAction;
 use crate::build::{CommonBuild, ShortBuild};
 use crate::client::{self, Result};
 use crate::client_internals::{Name, Path};
 use crate::queue::ShortQueueItem;
 use crate::view::ViewName;
-use crate::Jenkins;
 
 /// Ball Color corresponding to a `BuildStatus`
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -95,11 +95,10 @@ where
         let path = jenkins_client.url_to_path(&self.url);
         if let Path::Job { .. } = path {
             return Ok(jenkins_client.get(&path)?.json()?);
-        } else if let Path::InFolder { path: sub_path, .. } = &path {
-            if let Path::Job { .. } = sub_path.as_ref() {
+        } else if let Path::InFolder { path: sub_path, .. } = &path
+            && let Path::Job { .. } = sub_path.as_ref() {
                 return Ok(jenkins_client.get(&path)?.json()?);
             }
-        }
         Err(client::Error::InvalidUrl {
             url: self.url.clone(),
             expected: client::error::ExpectedType::Job,
@@ -241,15 +240,14 @@ pub trait Job {
             path: sub_path,
             folder_name,
         } = &path
+            && let Path::Job { name, .. } = sub_path.as_ref()
         {
-            if let Path::Job { name, .. } = sub_path.as_ref() {
-                return Ok(jenkins_client
-                    .get(&Path::ConfigXML {
-                        job_name: name.clone(),
-                        folder_name: Some(folder_name.clone()),
-                    })?
-                    .text()?);
-            }
+            return Ok(jenkins_client
+                .get(&Path::ConfigXML {
+                    job_name: name.clone(),
+                    folder_name: Some(folder_name.clone()),
+                })?
+                .text()?);
         }
 
         Err(client::Error::InvalidUrl {
