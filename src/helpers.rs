@@ -7,7 +7,7 @@ pub trait Class {
 }
 
 macro_rules! register_class {
-    ($class:expr => $variant:ty) => {
+    ($class:expr_2021 => $variant:ty) => {
         impl Class for $variant {
             fn with_class() -> &'static str {
                 $class
