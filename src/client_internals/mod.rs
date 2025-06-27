@@ -8,8 +8,7 @@ use regex::Regex;
 use reqwest::{
     StatusCode,
     blocking::{Body, Client, RequestBuilder, Response},
-    header::CONTENT_TYPE,
-    header::HeaderValue,
+    header::{CONTENT_TYPE, HeaderValue, USER_AGENT},
 };
 use serde::Serialize;
 
@@ -91,6 +90,10 @@ impl Jenkins {
             request_builder =
                 request_builder.basic_auth(user.username.clone(), user.password.clone());
         }
+        request_builder = request_builder.header(
+            USER_AGENT,
+            format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
+        );
         let query = request_builder.build()?;
         debug!("sending {} {}", query.method(), query.url());
         Ok(self.client.execute(query)?)
