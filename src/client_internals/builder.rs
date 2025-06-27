@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, time::Duration};
 
 use reqwest::{self, Url, blocking::Client};
 
@@ -25,6 +25,7 @@ pub struct JenkinsBuilder {
     user: Option<User>,
     csrf_enabled: bool,
     depth: u8,
+    timeout: Option<Duration>,
 }
 
 impl JenkinsBuilder {
@@ -41,6 +42,7 @@ impl JenkinsBuilder {
             user: None,
             csrf_enabled: true,
             depth: 1,
+            timeout: Some(Duration::from_secs(30)),
         }
     }
 
@@ -56,7 +58,7 @@ impl JenkinsBuilder {
 
         Ok(Jenkins {
             url: self.url,
-            client: Client::builder().build()?,
+            client: Client::builder().timeout(self.timeout).build()?,
             user: self.user,
             csrf_enabled: self.csrf_enabled,
             depth: self.depth,
@@ -82,6 +84,12 @@ impl JenkinsBuilder {
     /// controls the amount of data in responses
     pub fn with_depth(mut self, depth: u8) -> Self {
         self.depth = depth;
+        self
+    }
+
+    /// Set the timeout for requests
+    pub fn with_timeout<T: Into<Option<Duration>>>(mut self, timeout: T) -> Self {
+        self.timeout = timeout.into();
         self
     }
 }
