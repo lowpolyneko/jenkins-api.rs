@@ -16,26 +16,30 @@ impl Serialize for TreeQueryParam {
         serializer.serialize_str(&self.to_string())
     }
 }
-impl ToString for TreeQueryParam {
-    fn to_string(&self) -> String {
-        match (self.keyname.as_ref(), self.subkeys.len()) {
-            (Some(keyname), 0) => keyname.clone(),
-            (Some(keyname), _) => format!(
-                "{}[{}]",
-                keyname,
-                self.subkeys
+impl std::fmt::Display for TreeQueryParam {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match (self.keyname.as_ref(), self.subkeys.len()) {
+                (Some(keyname), 0) => keyname.clone(),
+                (Some(keyname), _) => format!(
+                    "{}[{}]",
+                    keyname,
+                    self.subkeys
+                        .iter()
+                        .map(TreeQueryParam::to_string)
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+                (None, _) => self
+                    .subkeys
                     .iter()
                     .map(TreeQueryParam::to_string)
                     .collect::<Vec<_>>()
-                    .join(",")
-            ),
-            (None, _) => self
-                .subkeys
-                .iter()
-                .map(TreeQueryParam::to_string)
-                .collect::<Vec<_>>()
-                .join(","),
-        }
+                    .join(","),
+            }
+        )
     }
 }
 

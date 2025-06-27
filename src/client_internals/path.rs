@@ -10,12 +10,16 @@ pub enum Name<'a> {
     UrlEncodedName(&'a str),
 }
 
-impl<'a> ToString for Name<'a> {
-    fn to_string(&self) -> String {
-        match *self {
-            Name::Name(name) => urlencoding::encode(name),
-            Name::UrlEncodedName(name) => name.to_string(),
-        }
+impl<'a> std::fmt::Display for Name<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                Name::Name(name) => urlencoding::encode(name),
+                Name::UrlEncodedName(name) => name.to_string(),
+            }
+        )
     }
 }
 
@@ -90,143 +94,117 @@ pub enum Path<'a> {
     CrumbIssuer,
 }
 
-impl<'a> ToString for Path<'a> {
-    fn to_string(&self) -> String {
-        match *self {
-            Path::Home => "".to_string(),
-            Path::View { ref name } => format!("/view/{}", name.to_string()),
-            Path::AddJobToView {
-                ref job_name,
-                ref view_name,
-            } => format!(
-                "/view/{}/addJobToView?name={}",
-                view_name.to_string(),
-                job_name.to_string()
-            ),
-            Path::RemoveJobFromView {
-                ref job_name,
-                ref view_name,
-            } => format!(
-                "/view/{}/removeJobFromView?name={}",
-                view_name.to_string(),
-                job_name.to_string()
-            ),
-            Path::Job {
-                ref name,
-                configuration: Some(ref configuration),
-            } => format!("/job/{}/{}", name.to_string(), configuration.to_string()),
-            Path::Job {
-                ref name,
-                configuration: None,
-            } => format!("/job/{}", name.to_string()),
-            Path::BuildJob { ref name } => format!("/job/{}/build", name.to_string()),
-            Path::BuildJobWithParameters { ref name } => {
-                format!("/job/{}/buildWithParameters", name.to_string())
+impl<'a> std::fmt::Display for Path<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                Path::Home => "".to_string(),
+                Path::View { ref name } => format!("/view/{name}"),
+                Path::AddJobToView {
+                    ref job_name,
+                    ref view_name,
+                } => format!(
+                    "/view/{view_name}/addJobToView?name={job_name}"
+                ),
+                Path::RemoveJobFromView {
+                    ref job_name,
+                    ref view_name,
+                } => format!(
+                    "/view/{view_name}/removeJobFromView?name={job_name}"
+                ),
+                Path::Job {
+                    ref name,
+                    configuration: Some(ref configuration),
+                } => format!("/job/{name}/{configuration}"),
+                Path::Job {
+                    ref name,
+                    configuration: None,
+                } => format!("/job/{name}"),
+                Path::BuildJob { ref name } => format!("/job/{name}/build"),
+                Path::BuildJobWithParameters { ref name } => {
+                    format!("/job/{name}/buildWithParameters")
+                }
+                Path::PollSCMJob { ref name } => format!("/job/{name}/polling"),
+                Path::JobEnable { ref name } => format!("/job/{name}/enable"),
+                Path::JobDisable { ref name } => format!("/job/{name}/disable"),
+                Path::Build {
+                    ref job_name,
+                    ref number,
+                    configuration: None,
+                } => format!("/job/{job_name}/{number}"),
+                Path::Build {
+                    ref job_name,
+                    ref number,
+                    configuration: Some(ref configuration),
+                } => format!(
+                    "/job/{job_name}/{configuration}/{number}"
+                ),
+                Path::ConsoleText {
+                    ref job_name,
+                    ref number,
+                    configuration: None,
+                    folder_name: None,
+                } => format!("/job/{job_name}/{number}/consoleText"),
+                Path::ConsoleText {
+                    ref job_name,
+                    ref number,
+                    configuration: Some(ref configuration),
+                    folder_name: None,
+                } => format!(
+                    "/job/{job_name}/{configuration}/{number}/consoleText"
+                ),
+                Path::ConsoleText {
+                    ref job_name,
+                    ref number,
+                    configuration: None,
+                    folder_name: Some(ref folder_name),
+                } => format!(
+                    "/job/{folder_name}/job/{job_name}/{number}/consoleText"
+                ),
+                Path::ConsoleText {
+                    ref job_name,
+                    ref number,
+                    configuration: Some(ref configuration),
+                    folder_name: Some(ref folder_name),
+                } => format!(
+                    "/job/{folder_name}/job/{job_name}/{configuration}/{number}/consoleText"
+                ),
+                Path::ConfigXML {
+                    ref job_name,
+                    folder_name: None,
+                } => format!("/job/{job_name}/config.xml",),
+                Path::ConfigXML {
+                    ref job_name,
+                    folder_name: Some(ref folder_name),
+                } => format!(
+                    "/job/{folder_name}/job/{job_name}/config.xml",
+                ),
+                Path::Queue => "/queue".to_string(),
+                Path::QueueItem { ref id } => format!("/queue/item/{id}"),
+                Path::MavenArtifactRecord {
+                    ref job_name,
+                    ref number,
+                    configuration: None,
+                } => format!("/job/{job_name}/{number}/mavenArtifacts"),
+                Path::MavenArtifactRecord {
+                    ref job_name,
+                    ref number,
+                    configuration: Some(ref configuration),
+                } => format!(
+                    "/job/{job_name}/{configuration}/{number}/mavenArtifacts"
+                ),
+                Path::InFolder {
+                    ref folder_name,
+                    ref path,
+                } => format!("/job/{folder_name}{path}"),
+                Path::Computers => "/computer/api/json".to_string(),
+                Path::Computer { ref name } => format!("/computer/{name}/api/json"),
+                Path::Raw { path } => path.to_string(),
+                Path::CrumbIssuer => "/crumbIssuer".to_string(),
             }
-            Path::PollSCMJob { ref name } => format!("/job/{}/polling", name.to_string()),
-            Path::JobEnable { ref name } => format!("/job/{}/enable", name.to_string()),
-            Path::JobDisable { ref name } => format!("/job/{}/disable", name.to_string()),
-            Path::Build {
-                ref job_name,
-                ref number,
-                configuration: None,
-            } => format!("/job/{}/{}", job_name.to_string(), number.to_string()),
-            Path::Build {
-                ref job_name,
-                ref number,
-                configuration: Some(ref configuration),
-            } => format!(
-                "/job/{}/{}/{}",
-                job_name.to_string(),
-                configuration.to_string(),
-                number.to_string()
-            ),
-            Path::ConsoleText {
-                ref job_name,
-                ref number,
-                configuration: None,
-                folder_name: None,
-            } => format!(
-                "/job/{}/{}/consoleText",
-                job_name.to_string(),
-                number.to_string()
-            ),
-            Path::ConsoleText {
-                ref job_name,
-                ref number,
-                configuration: Some(ref configuration),
-                folder_name: None,
-            } => format!(
-                "/job/{}/{}/{}/consoleText",
-                job_name.to_string(),
-                configuration.to_string(),
-                number.to_string()
-            ),
-            Path::ConsoleText {
-                ref job_name,
-                ref number,
-                configuration: None,
-                folder_name: Some(ref folder_name),
-            } => format!(
-                "/job/{}/job/{}/{}/consoleText",
-                folder_name.to_string(),
-                job_name.to_string(),
-                number.to_string()
-            ),
-            Path::ConsoleText {
-                ref job_name,
-                ref number,
-                configuration: Some(ref configuration),
-                folder_name: Some(ref folder_name),
-            } => format!(
-                "/job/{}/job/{}/{}/{}/consoleText",
-                folder_name.to_string(),
-                job_name.to_string(),
-                configuration.to_string(),
-                number.to_string()
-            ),
-            Path::ConfigXML {
-                ref job_name,
-                folder_name: None,
-            } => format!("/job/{}/config.xml", job_name.to_string(),),
-            Path::ConfigXML {
-                ref job_name,
-                folder_name: Some(ref folder_name),
-            } => format!(
-                "/job/{}/job/{}/config.xml",
-                folder_name.to_string(),
-                job_name.to_string(),
-            ),
-            Path::Queue => "/queue".to_string(),
-            Path::QueueItem { ref id } => format!("/queue/item/{id}"),
-            Path::MavenArtifactRecord {
-                ref job_name,
-                ref number,
-                configuration: None,
-            } => format!(
-                "/job/{}/{}/mavenArtifacts",
-                job_name.to_string(),
-                number.to_string()
-            ),
-            Path::MavenArtifactRecord {
-                ref job_name,
-                ref number,
-                configuration: Some(ref configuration),
-            } => format!(
-                "/job/{}/{}/{}/mavenArtifacts",
-                job_name.to_string(),
-                configuration.to_string(),
-                number.to_string()
-            ),
-            Path::InFolder {
-                ref folder_name,
-                ref path,
-            } => format!("/job/{}{}", folder_name.to_string(), path.to_string()),
-            Path::Computers => "/computer/api/json".to_string(),
-            Path::Computer { ref name } => format!("/computer/{}/api/json", name.to_string()),
-            Path::Raw { path } => path.to_string(),
-            Path::CrumbIssuer => "/crumbIssuer".to_string(),
-        }
+        )
     }
 }
 

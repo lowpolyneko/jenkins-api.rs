@@ -4,11 +4,11 @@ use serde::{self, Deserialize, Serialize};
 
 use crate::helpers::Class;
 
+use crate::Jenkins;
 use crate::action::CommonAction;
 use crate::client::{self, Result};
 use crate::client_internals::path::Path;
 use crate::job::{CommonJob, Job};
-use crate::Jenkins;
 
 /// Short Build that is used in lists and links from other structs
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -45,9 +45,10 @@ where
         if let Path::Build { .. } = path {
             return Ok(jenkins_client.get(&path)?.json()?);
         } else if let Path::InFolder { path: sub_path, .. } = &path
-            && let Path::Build { .. } = sub_path.as_ref() {
-                return Ok(jenkins_client.get(&path)?.json()?);
-            }
+            && let Path::Build { .. } = sub_path.as_ref()
+        {
+            return Ok(jenkins_client.get(&path)?.json()?);
+        }
         Err(client::Error::InvalidUrl {
             url: self.url.clone(),
             expected: client::error::ExpectedType::Build,
@@ -104,18 +105,22 @@ pub enum BuildNumber {
     /// Unknown alias
     UnknwonAlias(String),
 }
-impl ToString for BuildNumber {
-    fn to_string(&self) -> String {
-        match self {
-            BuildNumber::LastBuild => "lastBuild".to_string(),
-            BuildNumber::LastSuccessfulBuild => "lastSuccessfulBuild".to_string(),
-            BuildNumber::LastStableBuild => "lastStableBuild".to_string(),
-            BuildNumber::LastCompletedBuild => "lastCompletedBuild".to_string(),
-            BuildNumber::LastFailedBuild => "lastFailedBuild".to_string(),
-            BuildNumber::LastUnsuccessfulBuild => "lastUnsuccessfulBuild".to_string(),
-            BuildNumber::Number(n) => n.to_string(),
-            BuildNumber::UnknwonAlias(s) => s.to_string(),
-        }
+impl std::fmt::Display for BuildNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                BuildNumber::LastBuild => "lastBuild".to_string(),
+                BuildNumber::LastSuccessfulBuild => "lastSuccessfulBuild".to_string(),
+                BuildNumber::LastStableBuild => "lastStableBuild".to_string(),
+                BuildNumber::LastCompletedBuild => "lastCompletedBuild".to_string(),
+                BuildNumber::LastFailedBuild => "lastFailedBuild".to_string(),
+                BuildNumber::LastUnsuccessfulBuild => "lastUnsuccessfulBuild".to_string(),
+                BuildNumber::Number(n) => n.to_string(),
+                BuildNumber::UnknwonAlias(s) => s.to_string(),
+            }
+        )
     }
 }
 impl<'a> From<&'a str> for BuildNumber {
@@ -197,17 +202,17 @@ pub trait Build {
                 configuration,
                 ..
             } = sub_path.as_ref()
-            {
-                return Ok(jenkins_client
-                    .get(&Path::InFolder {
-                        folder_name: folder_name.clone(),
-                        path: Box::new(Path::Job {
-                            name: job_name.clone(),
-                            configuration: configuration.clone(),
-                        }),
-                    })?
-                    .json()?);
-            }
+        {
+            return Ok(jenkins_client
+                .get(&Path::InFolder {
+                    folder_name: folder_name.clone(),
+                    path: Box::new(Path::Job {
+                        name: job_name.clone(),
+                        configuration: configuration.clone(),
+                    }),
+                })?
+                .json()?);
+        }
         Err(client::Error::InvalidUrl {
             url: self.url().to_string(),
             expected: client::error::ExpectedType::Build,
@@ -241,16 +246,16 @@ pub trait Build {
                 number,
                 configuration,
             } = sub_path.as_ref()
-            {
-                return Ok(jenkins_client
-                    .get(&Path::ConsoleText {
-                        job_name: job_name.clone(),
-                        number: number.clone(),
-                        configuration: configuration.clone(),
-                        folder_name: Some(folder_name.clone()),
-                    })?
-                    .text()?);
-            }
+        {
+            return Ok(jenkins_client
+                .get(&Path::ConsoleText {
+                    job_name: job_name.clone(),
+                    number: number.clone(),
+                    configuration: configuration.clone(),
+                    folder_name: Some(folder_name.clone()),
+                })?
+                .text()?);
+        }
 
         Err(client::Error::InvalidUrl {
             url: self.url().to_string(),
