@@ -7,7 +7,7 @@ pub trait Class {
 }
 
 macro_rules! register_class {
-    ($class:expr_2021 => $variant:ty) => {
+    ($class:expr => $variant:ty) => {
         impl Class for $variant {
             fn with_class() -> &'static str {
                 $class
@@ -21,9 +21,9 @@ macro_rules! specialize {
         impl $common {
             #[doc = "Read the object as one of it's specialization implementing $trait"]
             #[allow(unused_qualifications)]
-            pub fn as_variant<T: Class + $trait>(&self) -> std::result::Result<T, serde_json::Error>
+            pub fn as_variant<T>(&self) -> std::result::Result<T, serde_json::Error>
             where
-                for<'de> T: Deserialize<'de>,
+                for<'de> T: $trait + Class + Deserialize<'de>,
             {
                 let value = serde_json::to_value(self)?;
                 match self.class {
@@ -37,7 +37,7 @@ macro_rules! specialize {
                                 .clone()
                                 .ok_or(serde::de::Error::custom("missing _class"))?,
                             T::with_class()
-                        )))
+                        )));
                     }
                 }
             }
