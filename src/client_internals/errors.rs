@@ -96,8 +96,8 @@ pub enum Action {
 impl fmt::Display for Action {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Action::GetField(field) => write!(f, "get field '{}'", field),
-            Action::GetLinkedItem(item) => write!(f, "get linked item '{}'", item),
+            Action::GetField(field) => write!(f, "get field '{field}'"),
+            Action::GetLinkedItem(item) => write!(f, "get linked item '{item}'"),
         }
     }
 }

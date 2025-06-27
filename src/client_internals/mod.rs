@@ -99,13 +99,13 @@ impl Jenkins {
     fn error_for_status(response: Response) -> Result<Response> {
         let status = response.status();
         if status.is_client_error() || status.is_server_error() {
-            warn!("got an error: {}", status);
+            warn!("got an error: {status}");
         }
         Ok(response.error_for_status()?)
     }
 
     pub(crate) fn get(&self, path: &Path) -> Result<Response> {
-        self.get_with_params(path, &[("depth", &self.depth.to_string())])
+        self.get_with_params(path, [("depth", &self.depth.to_string())])
     }
 
     pub(crate) fn get_with_params<T: Serialize>(&self, path: &Path, qps: T) -> Result<Response> {
@@ -113,7 +113,7 @@ impl Jenkins {
             .client
             .get(&self.url_api_json(&path.to_string()))
             .query(&qps);
-        Ok(Self::error_for_status(self.send(query)?)?)
+        Self::error_for_status(self.send(query)?)
     }
 
     pub(crate) fn post(&self, path: &Path) -> Result<Response> {
@@ -121,7 +121,7 @@ impl Jenkins {
 
         request_builder = self.add_csrf_to_request(request_builder)?;
 
-        Ok(Self::error_for_status(self.send(request_builder)?)?)
+        Self::error_for_status(self.send(request_builder)?)
     }
 
     pub(crate) fn post_with_body<T: Into<Body> + Debug>(
@@ -138,7 +138,7 @@ impl Jenkins {
             CONTENT_TYPE,
             HeaderValue::from_static("application/x-www-form-urlencoded"),
         );
-        debug!("{:?}", body);
+        debug!("{body:?}");
         request_builder = request_builder.query(qps).body(body);
         let response = self.send(request_builder)?;
 

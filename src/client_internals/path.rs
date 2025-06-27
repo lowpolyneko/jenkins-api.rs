@@ -198,7 +198,7 @@ impl<'a> ToString for Path<'a> {
                 job_name.to_string(),
             ),
             Path::Queue => "/queue".to_string(),
-            Path::QueueItem { ref id } => format!("/queue/item/{}", id),
+            Path::QueueItem { ref id } => format!("/queue/item/{id}"),
             Path::MavenArtifactRecord {
                 ref job_name,
                 ref number,

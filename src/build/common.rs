@@ -176,7 +176,7 @@ pub trait Build {
     where
         for<'de> Self::ParentJob: Deserialize<'de>,
     {
-        let path = jenkins_client.url_to_path(&self.url());
+        let path = jenkins_client.url_to_path(self.url());
         if let Path::Build {
             job_name,
             configuration,
@@ -220,7 +220,7 @@ pub trait Build {
 
     /// Get the console output from a `Build`
     fn get_console(&self, jenkins_client: &Jenkins) -> Result<String> {
-        let path = jenkins_client.url_to_path(&self.url());
+        let path = jenkins_client.url_to_path(self.url());
         if let Path::Build {
             job_name,
             number,

@@ -87,22 +87,22 @@ impl TreeBuilder {
         self.tree
     }
 }
-impl Into<TreeQueryParam> for TreeBuilder {
-    fn into(self) -> TreeQueryParam {
-        self.build()
+impl From<TreeBuilder> for TreeQueryParam {
+    fn from(val: TreeBuilder) -> Self {
+        val.build()
     }
 }
-impl<'a> Into<TreeQueryParam> for &'a str {
-    fn into(self) -> TreeQueryParam {
+impl From<&str> for TreeQueryParam {
+    fn from(val: &str) -> Self {
         TreeQueryParam {
-            keyname: Some(self.to_string()),
+            keyname: Some(val.to_string()),
             subkeys: vec![],
         }
     }
 }
-impl Into<Option<super::AdvancedQuery>> for TreeQueryParam {
-    fn into(self) -> Option<super::AdvancedQuery> {
-        Some(super::AdvancedQuery::Tree(self))
+impl From<TreeQueryParam> for Option<super::AdvancedQuery> {
+    fn from(val: TreeQueryParam) -> Self {
+        Some(super::AdvancedQuery::Tree(val))
     }
 }
 impl Default for TreeBuilder {
