@@ -2,10 +2,10 @@
 
 use serde::Deserialize;
 
+use crate::Jenkins;
 use crate::client_internals::{Path, Result};
 use crate::job::ShortJob;
 use crate::view::ShortView;
-use crate::Jenkins;
 
 /// Describe how Jenkins allocates jobs to agents
 #[derive(Debug, Deserialize, Clone, Copy)]

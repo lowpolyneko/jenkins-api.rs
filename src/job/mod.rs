@@ -1,8 +1,8 @@
 //! Jenkins Jobs
 
+use crate::Jenkins;
 use crate::client_internals::{Name, Path, Result};
 use crate::queue::ShortQueueItem;
-use crate::Jenkins;
 
 pub mod builder;
 use self::builder::JobBuilder;

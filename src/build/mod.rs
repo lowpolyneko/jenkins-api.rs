@@ -1,9 +1,9 @@
 //! Jenkins Builds
 
+use crate::Jenkins;
 use crate::client::Result;
 use crate::client_internals::path::{Name, Path};
 use crate::job::JobName;
-use crate::Jenkins;
 
 #[macro_use]
 mod common;

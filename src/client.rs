@@ -2,12 +2,12 @@
 
 use serde::{self, Deserialize};
 
-use crate::client_internals::path::{Name, Path as PrivatePath};
 use crate::client_internals::InternalAdvancedQueryParams;
+use crate::client_internals::path::{Name, Path as PrivatePath};
 
 // pub use client_internals::path::Name;
 pub use crate::client_internals::AdvancedQuery;
-pub use crate::client_internals::{error, Error, Result};
+pub use crate::client_internals::{Error, Result, error};
 pub use crate::client_internals::{TreeBuilder, TreeQueryParam};
 
 use crate::build;

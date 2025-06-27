@@ -6,10 +6,10 @@ use std::string::ToString;
 use log::{debug, warn};
 use regex::Regex;
 use reqwest::{
-    blocking::{Body, Client, RequestBuilder, Response},
-    header::HeaderValue,
-    header::CONTENT_TYPE,
     StatusCode,
+    blocking::{Body, Client, RequestBuilder, Response},
+    header::CONTENT_TYPE,
+    header::HeaderValue,
 };
 use serde::Serialize;
 

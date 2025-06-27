@@ -4,11 +4,11 @@ use serde::{self, Deserialize, Serialize};
 
 use crate::helpers::Class;
 
+use crate::Jenkins;
 use crate::client::{self, Result};
 use crate::client_internals::{Name, Path};
 use crate::job::{JobName, ShortJob};
 use crate::property::CommonProperty;
-use crate::Jenkins;
 
 /// Short View that is used in lists and links from other structs
 #[derive(Deserialize, Serialize, Debug)]

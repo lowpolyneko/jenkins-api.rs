@@ -105,15 +105,11 @@ impl<'a> std::fmt::Display for Path<'a> {
                 Path::AddJobToView {
                     ref job_name,
                     ref view_name,
-                } => format!(
-                    "/view/{view_name}/addJobToView?name={job_name}"
-                ),
+                } => format!("/view/{view_name}/addJobToView?name={job_name}"),
                 Path::RemoveJobFromView {
                     ref job_name,
                     ref view_name,
-                } => format!(
-                    "/view/{view_name}/removeJobFromView?name={job_name}"
-                ),
+                } => format!("/view/{view_name}/removeJobFromView?name={job_name}"),
                 Path::Job {
                     ref name,
                     configuration: Some(ref configuration),
@@ -138,9 +134,7 @@ impl<'a> std::fmt::Display for Path<'a> {
                     ref job_name,
                     ref number,
                     configuration: Some(ref configuration),
-                } => format!(
-                    "/job/{job_name}/{configuration}/{number}"
-                ),
+                } => format!("/job/{job_name}/{configuration}/{number}"),
                 Path::ConsoleText {
                     ref job_name,
                     ref number,
@@ -152,17 +146,13 @@ impl<'a> std::fmt::Display for Path<'a> {
                     ref number,
                     configuration: Some(ref configuration),
                     folder_name: None,
-                } => format!(
-                    "/job/{job_name}/{configuration}/{number}/consoleText"
-                ),
+                } => format!("/job/{job_name}/{configuration}/{number}/consoleText"),
                 Path::ConsoleText {
                     ref job_name,
                     ref number,
                     configuration: None,
                     folder_name: Some(ref folder_name),
-                } => format!(
-                    "/job/{folder_name}/job/{job_name}/{number}/consoleText"
-                ),
+                } => format!("/job/{folder_name}/job/{job_name}/{number}/consoleText"),
                 Path::ConsoleText {
                     ref job_name,
                     ref number,
@@ -178,9 +168,7 @@ impl<'a> std::fmt::Display for Path<'a> {
                 Path::ConfigXML {
                     ref job_name,
                     folder_name: Some(ref folder_name),
-                } => format!(
-                    "/job/{folder_name}/job/{job_name}/config.xml",
-                ),
+                } => format!("/job/{folder_name}/job/{job_name}/config.xml",),
                 Path::Queue => "/queue".to_string(),
                 Path::QueueItem { ref id } => format!("/queue/item/{id}"),
                 Path::MavenArtifactRecord {
@@ -192,9 +180,7 @@ impl<'a> std::fmt::Display for Path<'a> {
                     ref job_name,
                     ref number,
                     configuration: Some(ref configuration),
-                } => format!(
-                    "/job/{job_name}/{configuration}/{number}/mavenArtifacts"
-                ),
+                } => format!("/job/{job_name}/{configuration}/{number}/mavenArtifacts"),
                 Path::InFolder {
                     ref folder_name,
                     ref path,

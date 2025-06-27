@@ -2,9 +2,9 @@
 
 use serde::Deserialize;
 
+use crate::Jenkins;
 use crate::client::{self, Result};
 use crate::client_internals::path::Path;
-use crate::Jenkins;
 
 /// Artifact produced by a build
 #[derive(Deserialize, Debug)]

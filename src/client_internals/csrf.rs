@@ -1,7 +1,7 @@
 use reqwest::{blocking::RequestBuilder, header::HeaderName, header::HeaderValue};
 use serde::Deserialize;
 
-use super::{path::Path, Jenkins};
+use super::{Jenkins, path::Path};
 use crate::client::Result;
 
 #[derive(Debug, Deserialize, Clone)]

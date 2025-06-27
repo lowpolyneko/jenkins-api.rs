@@ -4,11 +4,11 @@ use reqwest::header::LOCATION;
 
 use serde::{self, Serialize};
 
+use crate::Jenkins;
 use crate::client::{self, Result};
 use crate::client_internals::{Name, Path};
 use crate::job::{Job, JobName};
 use crate::queue::ShortQueueItem;
-use crate::Jenkins;
 
 /// Helper to build a job
 #[derive(Debug)]
@@ -49,16 +49,16 @@ impl<'a, 'b, 'c, 'd> JobBuilder<'a, 'b, 'c, 'd> {
                 name,
                 configuration: None,
             } = sub_path.as_ref()
-            {
-                return Ok(JobBuilder {
-                    job_name: name.clone(),
-                    jenkins_client,
-                    delay: None,
-                    cause: None,
-                    token: None,
-                    parameters: None,
-                });
-            }
+        {
+            return Ok(JobBuilder {
+                job_name: name.clone(),
+                jenkins_client,
+                delay: None,
+                cause: None,
+                token: None,
+                parameters: None,
+            });
+        }
         Err(client::Error::InvalidUrl {
             url: job.url().to_string(),
             expected: client::error::ExpectedType::Job,

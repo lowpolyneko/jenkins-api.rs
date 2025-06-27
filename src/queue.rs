@@ -2,12 +2,12 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::Jenkins;
 use crate::action::CommonAction;
 use crate::build::ShortBuild;
 use crate::client::{self, Result};
 use crate::client_internals::Path;
 use crate::job::ShortJob;
-use crate::Jenkins;
 
 /// Short Queue Item that is returned when building a job
 #[derive(Debug, Serialize, Deserialize, Clone)]

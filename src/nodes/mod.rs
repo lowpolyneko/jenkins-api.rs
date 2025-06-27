@@ -2,8 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::client_internals::{Name, Path, Result};
 use crate::Jenkins;
+use crate::client_internals::{Name, Path, Result};
 
 pub mod computer;
 pub mod monitor;
