@@ -274,7 +274,7 @@ pub trait Build {
         } = path
         {
             return Ok(jenkins_client
-                .get(&Path::Artifact {
+                .get_blob(&Path::Artifact {
                     job_name,
                     number,
                     configuration,

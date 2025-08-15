@@ -198,7 +198,7 @@ impl<'a> std::fmt::Display for Path<'a> {
                     ref number,
                     configuration: Some(ref configuration),
                     ref relative_path,
-                } => format!("/job/{job_name}/{configuration}/{number}/artifact/{relative_path}"),
+                } => format!("/job/{job_name}/{number}/{configuration}/artifact/{relative_path}"),
                 Path::InFolder {
                     ref folder_name,
                     ref path,

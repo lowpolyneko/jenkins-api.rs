@@ -119,6 +119,11 @@ impl Jenkins {
         Self::error_for_status(self.send(query)?)
     }
 
+    pub(crate) fn get_blob(&self, path: &Path) -> Result<Response> {
+        let query = self.client.get(&self.url(&path.to_string()));
+        Self::error_for_status(self.send(query)?)
+    }
+
     pub(crate) fn post(&self, path: &Path) -> Result<Response> {
         let mut request_builder = self.client.post(&self.url(&path.to_string()));
 
