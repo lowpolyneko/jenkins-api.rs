@@ -80,6 +80,12 @@ pub enum Path<'a> {
         number: build::BuildNumber,
         configuration: Option<Name<'a>>,
     },
+    Artifact {
+        job_name: Name<'a>,
+        number: build::BuildNumber,
+        configuration: Option<Name<'a>>,
+        relative_path: Name<'a>,
+    },
     InFolder {
         folder_name: Name<'a>,
         path: Box<Path<'a>>,
@@ -181,6 +187,18 @@ impl<'a> std::fmt::Display for Path<'a> {
                     ref number,
                     configuration: Some(ref configuration),
                 } => format!("/job/{job_name}/{configuration}/{number}/mavenArtifacts"),
+                Path::Artifact {
+                    ref job_name,
+                    ref number,
+                    configuration: None,
+                    ref relative_path,
+                } => format!("/job/{job_name}/{number}/artifact/{relative_path}"),
+                Path::Artifact {
+                    ref job_name,
+                    ref number,
+                    configuration: Some(ref configuration),
+                    ref relative_path,
+                } => format!("/job/{job_name}/{configuration}/{number}/artifact/{relative_path}"),
                 Path::InFolder {
                     ref folder_name,
                     ref path,

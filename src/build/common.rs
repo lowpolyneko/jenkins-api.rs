@@ -7,7 +7,7 @@ use crate::helpers::Class;
 use crate::Jenkins;
 use crate::action::CommonAction;
 use crate::client::{self, Result};
-use crate::client_internals::path::Path;
+use crate::client_internals::path::{Name, Path};
 use crate::job::{CommonJob, Job};
 
 /// Short Build that is used in lists and links from other structs
@@ -255,6 +255,32 @@ pub trait Build {
                     folder_name: Some(folder_name.clone()),
                 })?
                 .text()?);
+        }
+
+        Err(client::Error::InvalidUrl {
+            url: self.url().to_string(),
+            expected: client::error::ExpectedType::Build,
+        }
+        .into())
+    }
+
+    /// Get an artifact's contents from a `Build`
+    fn get_artifact(&self, jenkins_client: &Jenkins, artifact: &Artifact) -> Result<bytes::Bytes> {
+        let path = jenkins_client.url_to_path(self.url());
+        if let Path::Build {
+            job_name,
+            number,
+            configuration,
+        } = path
+        {
+            return Ok(jenkins_client
+                .get(&Path::Artifact {
+                    job_name,
+                    number,
+                    configuration,
+                    relative_path: Name::Name(&artifact.relative_path),
+                })?
+                .bytes()?);
         }
 
         Err(client::Error::InvalidUrl {
