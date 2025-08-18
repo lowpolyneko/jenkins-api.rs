@@ -139,7 +139,7 @@ impl super::Jenkins {
     /// }
     ///
     /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn main() -> jenkins_api::client::Result<()> {
     /// #    let jenkins = JenkinsBuilder::new("http://localhost:8080")
     /// #        .with_user("user", Some("password"))
     /// #        .build()?;

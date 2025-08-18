@@ -19,18 +19,19 @@
 //! # Example
 //!
 //! ```rust
-//!
 //! extern crate jenkins_api;
+//! extern crate tokio;
 //!
 //! use jenkins_api::JenkinsBuilder;
 //!
-//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! ##[tokio::main]
+//! async fn main() -> jenkins_api::client::Result<()> {
 //!     let jenkins = JenkinsBuilder::new("http://localhost:8080")
 //!         .with_user("user", Some("password"))
 //!         .build()?;
 //!
-//!     let job = jenkins.get_job("job name")?;
-//!     let build = job.last_build.as_ref().unwrap().get_full_build(&jenkins)?;
+//!     let job = jenkins.get_job("job name").await?;
+//!     let build = job.last_build.as_ref().unwrap().get_full_build(&jenkins).await?;
 //!
 //!     println!(
 //!         "last build for job {} at {} was {:?}",
