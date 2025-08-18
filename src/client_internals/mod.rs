@@ -6,8 +6,7 @@ use std::string::ToString;
 use log::{debug, warn};
 use regex::Regex;
 use reqwest::{
-    StatusCode,
-    blocking::{Body, Client, RequestBuilder, Response},
+    Body, Client, RequestBuilder, Response, StatusCode,
     header::{CONTENT_TYPE, HeaderValue, USER_AGENT},
 };
 use serde::Serialize;
@@ -85,7 +84,7 @@ impl Jenkins {
         format!("{}{}", self.url, endpoint)
     }
 
-    fn send(&self, mut request_builder: RequestBuilder) -> Result<Response> {
+    async fn send(&self, mut request_builder: RequestBuilder) -> Result<Response> {
         if let Some(ref user) = self.user {
             request_builder =
                 request_builder.basic_auth(user.username.clone(), user.password.clone());
@@ -96,7 +95,7 @@ impl Jenkins {
         );
         let query = request_builder.build()?;
         debug!("sending {} {}", query.method(), query.url());
-        Ok(self.client.execute(query)?)
+        Ok(self.client.execute(query).await?)
     }
 
     fn error_for_status(response: Response) -> Result<Response> {
@@ -107,40 +106,45 @@ impl Jenkins {
         Ok(response.error_for_status()?)
     }
 
-    pub(crate) fn get(&self, path: &Path) -> Result<Response> {
+    pub(crate) async fn get(&self, path: &Path<'_>) -> Result<Response> {
         self.get_with_params(path, [("depth", &self.depth.to_string())])
+            .await
     }
 
-    pub(crate) fn get_with_params<T: Serialize>(&self, path: &Path, qps: T) -> Result<Response> {
+    pub(crate) async fn get_with_params<T: Serialize>(
+        &self,
+        path: &Path<'_>,
+        qps: T,
+    ) -> Result<Response> {
         let query = self
             .client
             .get(&self.url_api_json(&path.to_string()))
             .query(&qps);
-        Self::error_for_status(self.send(query)?)
+        Self::error_for_status(self.send(query).await?)
     }
 
-    pub(crate) fn get_blob(&self, path: &Path) -> Result<Response> {
+    pub(crate) async fn get_blob(&self, path: &Path<'_>) -> Result<Response> {
         let query = self.client.get(&self.url(&path.to_string()));
-        Self::error_for_status(self.send(query)?)
+        Self::error_for_status(self.send(query).await?)
     }
 
-    pub(crate) fn post(&self, path: &Path) -> Result<Response> {
+    pub(crate) async fn post(&self, path: &Path<'_>) -> Result<Response> {
         let mut request_builder = self.client.post(&self.url(&path.to_string()));
 
-        request_builder = self.add_csrf_to_request(request_builder)?;
+        request_builder = self.add_csrf_to_request(request_builder).await?;
 
-        Self::error_for_status(self.send(request_builder)?)
+        Self::error_for_status(self.send(request_builder).await?)
     }
 
-    pub(crate) fn post_with_body<T: Into<Body> + Debug>(
+    pub(crate) async fn post_with_body<T: Into<Body> + Debug>(
         &self,
-        path: &Path,
+        path: &Path<'_>,
         body: T,
         qps: &[(&str, &str)],
     ) -> Result<Response> {
         let mut request_builder = self.client.post(&self.url(&path.to_string()));
 
-        request_builder = self.add_csrf_to_request(request_builder)?;
+        request_builder = self.add_csrf_to_request(request_builder).await?;
 
         request_builder = request_builder.header(
             CONTENT_TYPE,
@@ -148,7 +152,7 @@ impl Jenkins {
         );
         debug!("{body:?}");
         request_builder = request_builder.query(qps).body(body);
-        let response = self.send(request_builder)?;
+        let response = self.send(request_builder).await?;
 
         if response.status() == StatusCode::INTERNAL_SERVER_ERROR {
             // get the error before reading the body. In this case it can't be OK
@@ -157,7 +161,7 @@ impl Jenkins {
                 Err(err) => err,
             };
 
-            let body = response.text()?;
+            let body = response.text().await?;
 
             let re = Regex::new(r"java.lang.([a-zA-Z]+): (.*)").unwrap();
             if let Some(captures) = re.captures(&body) {
