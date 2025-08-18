@@ -1,6 +1,6 @@
 use std::{str::FromStr, time::Duration};
 
-use reqwest::{self, Url, blocking::Client};
+use reqwest::{self, Client, Url};
 
 use super::{Jenkins, User};
 use crate::client::Result;
@@ -56,9 +56,14 @@ impl JenkinsBuilder {
             return Err(url::ParseError::EmptyHost.into());
         }
 
+        let mut client = Client::builder();
+        if let Some(timeout) = self.timeout {
+            client = client.timeout(timeout);
+        }
+
         Ok(Jenkins {
             url: self.url,
-            client: Client::builder().timeout(self.timeout).build()?,
+            client: client.build()?,
             user: self.user,
             csrf_enabled: self.csrf_enabled,
             depth: self.depth,
