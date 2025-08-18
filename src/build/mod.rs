@@ -23,7 +23,7 @@ pub use self::multijob::MultiJobBuild;
 
 impl Jenkins {
     /// Get a build from a `job_name` and `build_number`
-    pub fn get_build<'a, J, B>(&self, job_name: J, build_number: B) -> Result<CommonBuild>
+    pub async fn get_build<'a, J, B>(&self, job_name: J, build_number: B) -> Result<CommonBuild>
     where
         J: Into<JobName<'a>>,
         B: Into<BuildNumber>,
@@ -33,7 +33,9 @@ impl Jenkins {
                 job_name: Name::Name(job_name.into().0),
                 number: build_number.into(),
                 configuration: None,
-            })?
-            .json()?)
+            })
+            .await?
+            .json()
+            .await?)
     }
 }
