@@ -40,14 +40,14 @@ where
     for<'de> T: Deserialize<'de>,
 {
     /// Get the full details of a `Build` matching the `ShortBuild`
-    pub fn get_full_build(&self, jenkins_client: &Jenkins) -> Result<T> {
+    pub async fn get_full_build(&self, jenkins_client: &Jenkins) -> Result<T> {
         let path = jenkins_client.url_to_path(&self.url);
         if let Path::Build { .. } = path {
-            return Ok(jenkins_client.get(&path)?.json()?);
+            return Ok(jenkins_client.get(&path).await?.json().await?);
         } else if let Path::InFolder { path: sub_path, .. } = &path
             && let Path::Build { .. } = sub_path.as_ref()
         {
-            return Ok(jenkins_client.get(&path)?.json()?);
+            return Ok(jenkins_client.get(&path).await?.json().await?);
         }
         Err(client::Error::InvalidUrl {
             url: self.url.clone(),
@@ -176,7 +176,7 @@ pub trait Build {
     fn url(&self) -> &str;
 
     /// Get the `Job` from a `Build`
-    fn get_job(&self, jenkins_client: &Jenkins) -> Result<Self::ParentJob>
+    async fn get_job(&self, jenkins_client: &Jenkins) -> Result<Self::ParentJob>
     where
         for<'de> Self::ParentJob: Deserialize<'de>,
     {
@@ -191,8 +191,10 @@ pub trait Build {
                 .get(&Path::Job {
                     name: job_name,
                     configuration,
-                })?
-                .json()?);
+                })
+                .await?
+                .json()
+                .await?);
         } else if let Path::InFolder {
             path: sub_path,
             folder_name,
@@ -210,8 +212,10 @@ pub trait Build {
                         name: job_name.clone(),
                         configuration: configuration.clone(),
                     }),
-                })?
-                .json()?);
+                })
+                .await?
+                .json()
+                .await?);
         }
         Err(client::Error::InvalidUrl {
             url: self.url().to_string(),
@@ -221,7 +225,7 @@ pub trait Build {
     }
 
     /// Get the console output from a `Build`
-    fn get_console(&self, jenkins_client: &Jenkins) -> Result<String> {
+    async fn get_console(&self, jenkins_client: &Jenkins) -> Result<String> {
         let path = jenkins_client.url_to_path(self.url());
         if let Path::Build {
             job_name,
@@ -235,8 +239,10 @@ pub trait Build {
                     number,
                     configuration,
                     folder_name: None,
-                })?
-                .text()?);
+                })
+                .await?
+                .text()
+                .await?);
         } else if let Path::InFolder {
             path: sub_path,
             folder_name,
@@ -253,8 +259,10 @@ pub trait Build {
                     number: number.clone(),
                     configuration: configuration.clone(),
                     folder_name: Some(folder_name.clone()),
-                })?
-                .text()?);
+                })
+                .await?
+                .text()
+                .await?);
         }
 
         Err(client::Error::InvalidUrl {
@@ -265,7 +273,11 @@ pub trait Build {
     }
 
     /// Get an artifact's contents from a `Build`
-    fn get_artifact(&self, jenkins_client: &Jenkins, artifact: &Artifact) -> Result<bytes::Bytes> {
+    async fn get_artifact(
+        &self,
+        jenkins_client: &Jenkins,
+        artifact: &Artifact,
+    ) -> Result<bytes::Bytes> {
         let path = jenkins_client.url_to_path(self.url());
         if let Path::Build {
             job_name,
@@ -279,8 +291,10 @@ pub trait Build {
                     number,
                     configuration,
                     relative_path: Name::Name(&artifact.relative_path),
-                })?
-                .bytes()?);
+                })
+                .await?
+                .bytes()
+                .await?);
         }
 
         Err(client::Error::InvalidUrl {

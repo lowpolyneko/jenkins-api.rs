@@ -138,7 +138,8 @@ impl super::Jenkins {
     ///     last_build: LastBuild,
     /// }
     ///
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// #    let jenkins = JenkinsBuilder::new("http://localhost:8080")
     /// #        .with_user("user", Some("password"))
     /// #        .build()?;
@@ -156,12 +157,12 @@ impl super::Jenkins {
     ///                 .with_subfield("result"),
     ///         )
     ///         .build(),
-    /// )?;
+    /// ).await?;
     /// #    Ok(())
     /// # }
     /// ```
     ///
-    pub fn get_object_as<Q, T>(&self, object: Path, parameters: Q) -> Result<T>
+    pub async fn get_object_as<Q, T>(&self, object: Path<'_>, parameters: Q) -> Result<T>
     where
         Q: Into<Option<AdvancedQuery>>,
         for<'de> T: Deserialize<'de>,
@@ -170,7 +171,9 @@ impl super::Jenkins {
             .get_with_params(
                 &object.into(),
                 parameters.into().map(InternalAdvancedQueryParams::from),
-            )?
-            .json()?)
+            )
+            .await?
+            .json()
+            .await?)
     }
 }
