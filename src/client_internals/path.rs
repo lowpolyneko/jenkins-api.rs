@@ -17,7 +17,7 @@ impl<'a> std::fmt::Display for Name<'a> {
             "{}",
             match *self {
                 Name::Name(name) => urlencoding::encode(name),
-                Name::UrlEncodedName(name) => name.to_string(),
+                Name::UrlEncodedName(name) => name.to_string().into(),
             }
         )
     }
