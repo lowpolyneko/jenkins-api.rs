@@ -168,7 +168,7 @@ into_buildnumber!(i32);
 into_buildnumber!(i64);
 
 /// Trait implemented by specializations of `Build` and providing common methods
-pub trait Build {
+pub trait Build: Sync {
     /// Type of the job that triggered this build
     type ParentJob: Job;
 
@@ -176,132 +176,141 @@ pub trait Build {
     fn url(&self) -> &str;
 
     /// Get the `Job` from a `Build`
-    async fn get_job(&self, jenkins_client: &Jenkins) -> Result<Self::ParentJob>
+    fn get_job(
+        &self,
+        jenkins_client: &Jenkins,
+    ) -> impl Future<Output = Result<Self::ParentJob>> + Send
     where
         for<'de> Self::ParentJob: Deserialize<'de>,
     {
-        let path = jenkins_client.url_to_path(self.url());
-        if let Path::Build {
-            job_name,
-            configuration,
-            ..
-        } = path
-        {
-            return Ok(jenkins_client
-                .get(&Path::Job {
-                    name: job_name,
-                    configuration,
-                })
-                .await?
-                .json()
-                .await?);
-        } else if let Path::InFolder {
-            path: sub_path,
-            folder_name,
-        } = &path
-            && let Path::Build {
+        async {
+            let path = jenkins_client.url_to_path(self.url());
+            if let Path::Build {
                 job_name,
                 configuration,
                 ..
-            } = sub_path.as_ref()
-        {
-            return Ok(jenkins_client
-                .get(&Path::InFolder {
-                    folder_name: folder_name.clone(),
-                    path: Box::new(Path::Job {
-                        name: job_name.clone(),
-                        configuration: configuration.clone(),
-                    }),
-                })
-                .await?
-                .json()
-                .await?);
+            } = path
+            {
+                return Ok(jenkins_client
+                    .get(&Path::Job {
+                        name: job_name,
+                        configuration,
+                    })
+                    .await?
+                    .json()
+                    .await?);
+            } else if let Path::InFolder {
+                path: sub_path,
+                folder_name,
+            } = &path
+                && let Path::Build {
+                    job_name,
+                    configuration,
+                    ..
+                } = sub_path.as_ref()
+            {
+                return Ok(jenkins_client
+                    .get(&Path::InFolder {
+                        folder_name: folder_name.clone(),
+                        path: Box::new(Path::Job {
+                            name: job_name.clone(),
+                            configuration: configuration.clone(),
+                        }),
+                    })
+                    .await?
+                    .json()
+                    .await?);
+            }
+            Err(client::Error::InvalidUrl {
+                url: self.url().to_string(),
+                expected: client::error::ExpectedType::Build,
+            }
+            .into())
         }
-        Err(client::Error::InvalidUrl {
-            url: self.url().to_string(),
-            expected: client::error::ExpectedType::Build,
-        }
-        .into())
     }
 
     /// Get the console output from a `Build`
-    async fn get_console(&self, jenkins_client: &Jenkins) -> Result<String> {
-        let path = jenkins_client.url_to_path(self.url());
-        if let Path::Build {
-            job_name,
-            number,
-            configuration,
-        } = path
-        {
-            return Ok(jenkins_client
-                .get(&Path::ConsoleText {
-                    job_name,
-                    number,
-                    configuration,
-                    folder_name: None,
-                })
-                .await?
-                .text()
-                .await?);
-        } else if let Path::InFolder {
-            path: sub_path,
-            folder_name,
-        } = &path
-            && let Path::Build {
+    fn get_console(&self, jenkins_client: &Jenkins) -> impl Future<Output = Result<String>> + Send {
+        async {
+            let path = jenkins_client.url_to_path(self.url());
+            if let Path::Build {
                 job_name,
                 number,
                 configuration,
-            } = sub_path.as_ref()
-        {
-            return Ok(jenkins_client
-                .get(&Path::ConsoleText {
-                    job_name: job_name.clone(),
-                    number: number.clone(),
-                    configuration: configuration.clone(),
-                    folder_name: Some(folder_name.clone()),
-                })
-                .await?
-                .text()
-                .await?);
-        }
-
-        Err(client::Error::InvalidUrl {
-            url: self.url().to_string(),
-            expected: client::error::ExpectedType::Build,
-        }
-        .into())
-    }
-
-    /// Get an artifact's contents from a `Build`
-    async fn get_artifact(
-        &self,
-        jenkins_client: &Jenkins,
-        artifact: &Artifact,
-    ) -> Result<bytes::Bytes> {
-        let path = jenkins_client.url_to_path(self.url());
-        if let Path::Build {
-            job_name,
-            number,
-            configuration,
-        } = path
-        {
-            return Ok(jenkins_client
-                .get_blob(&Path::Artifact {
+            } = path
+            {
+                return Ok(jenkins_client
+                    .get(&Path::ConsoleText {
+                        job_name,
+                        number,
+                        configuration,
+                        folder_name: None,
+                    })
+                    .await?
+                    .text()
+                    .await?);
+            } else if let Path::InFolder {
+                path: sub_path,
+                folder_name,
+            } = &path
+                && let Path::Build {
                     job_name,
                     number,
                     configuration,
-                    relative_path: Name::Name(&artifact.relative_path),
-                })
-                .await?
-                .bytes()
-                .await?);
-        }
+                } = sub_path.as_ref()
+            {
+                return Ok(jenkins_client
+                    .get(&Path::ConsoleText {
+                        job_name: job_name.clone(),
+                        number: number.clone(),
+                        configuration: configuration.clone(),
+                        folder_name: Some(folder_name.clone()),
+                    })
+                    .await?
+                    .text()
+                    .await?);
+            }
 
-        Err(client::Error::InvalidUrl {
-            url: self.url().to_string(),
-            expected: client::error::ExpectedType::Build,
+            Err(client::Error::InvalidUrl {
+                url: self.url().to_string(),
+                expected: client::error::ExpectedType::Build,
+            }
+            .into())
         }
-        .into())
+    }
+
+    /// Get an artifact's contents from a `Build`
+    fn get_artifact(
+        &self,
+        jenkins_client: &Jenkins,
+        artifact: &Artifact,
+    ) -> impl Future<Output = Result<bytes::Bytes>> + Send {
+        async {
+            let path = jenkins_client.url_to_path(self.url());
+            if let Path::Build {
+                job_name,
+                number,
+                configuration,
+            } = path
+            {
+                return Ok(jenkins_client
+                    .get_blob(&Path::Artifact {
+                        job_name,
+                        number,
+                        configuration,
+                        relative_path: Name::Name(&artifact.relative_path),
+                    })
+                    .await?
+                    .bytes()
+                    .await?);
+            }
+
+            Err(client::Error::InvalidUrl {
+                url: self.url().to_string(),
+                expected: client::error::ExpectedType::Build,
+            }
+            .into())
+        }
     }
 }
 
