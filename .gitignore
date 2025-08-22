@@ -1,11 +1,4 @@
-/target/
-**/*.rs.bk
-Cargo.lock
+target/
+
 .direnv/
 .envrc
-
-tests/jenkins_test
-tests/Dockerfile
-
-.dockerignore
-TODO.md
