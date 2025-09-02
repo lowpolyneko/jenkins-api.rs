@@ -14,7 +14,7 @@
 )]
 #![allow(clippy::type_repetition_in_bounds)]
 
-//! Bindings to [Jenkins JSON API](https://wiki.jenkins.io/display/JENKINS/Remote+access+API)
+//! Bindings to [Jenkins JSON API](https://www.jenkins.io/doc/book/using/remote-access-api/)
 //!
 //! # Example
 //!
