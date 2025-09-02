@@ -1,8 +1,6 @@
-# jenkins-api.rs [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/mockersf/jenkins-api.rs.svg?branch=master)](https://travis-ci.org/mockersf/jenkins-api.rs) [![Coverage Status](https://coveralls.io/repos/github/mockersf/jenkins-api.rs/badge.svg?branch=master)](https://coveralls.io/github/mockersf/jenkins-api.rs?branch=master) [![Realease Doc](https://docs.rs/jenkins_api/badge.svg)](https://docs.rs/jenkins_api) [![Crate](https://img.shields.io/crates/v/jenkins_api.svg)](https://crates.io/crates/jenkins_api)
+# jenkins-api.rs [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Release Doc](https://docs.rs/jenkins_api/badge.svg)](https://docs.rs/jenkins_api) [![Crate](https://img.shields.io/crates/v/jenkins_api.svg)](https://crates.io/crates/jenkins_api)
 
-Bindings to [Jenkins JSON API](https://wiki.jenkins.io/display/JENKINS/Remote+access+API)
-
-The API docs for the master branch are published [here](https://mockersf.github.io/jenkins-api.rs/).
+Bindings to [Jenkins JSON API](https://www.jenkins.io/doc/book/using/remote-access-api/)
 
 ## Example
 
