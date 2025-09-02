@@ -1,6 +1,23 @@
 # Changes
 
-# 0.7.0 (2019/11/17à
+# 0.9.0 (2025/09/02)
+
+* BREAKING: Switched to `reqwest::Client` over `reqwest::blocking::Client`. `jenkins_api` is now fully `async`.
+* Added `Send + Sync` bounds to `Error` type
+* Updated to Rust 2024
+* Added `User-Agent` to request header
+* Added a timeout to `JenkinsBuilder`
+* Added method to query artifacts as `bytes::Bytes`
+
+# 0.8.0 (2020/05/23)
+
+* Jenkins agent port changed from an u32 to an enum AgentPort #50
+* New method to get config.xml from a job #55
+* Added feature extra-fields-visibility that allow public access to fields that were not parsed as part of a specific object type #52
+* Folder management #51
+* Multibranch pipeline project management #36
+
+# 0.7.0 (2019/11/17)
 
 * Removed dependency to failure
 
