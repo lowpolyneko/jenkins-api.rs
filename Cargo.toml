@@ -1,18 +1,15 @@
 [package]
 name = "jenkins_api"
 version = "0.8.0"
-authors = ["François Mockers <mockersf@gmail.com>"]
+authors = ["Neko <lowpolyneko@protonmail.ch>", "François Mockers <mockersf@gmail.com>"]
 description = "Bindings for the Jenkins JSON API"
-repository = "https://github.com/mockersf/jenkins-api.rs"
-homepage = "https://github.com/mockersf/jenkins-api.rs"
+repository = "https://github.com/lowpolyneko/jenkins-api.rs"
+homepage = "https://github.com/lowpolyneko/jenkins-api.rs"
 documentation = "https://docs.rs/jenkins_api"
 keywords = ["jenkins"]
 license = "MIT"
 readme = "README.md"
 edition = "2024"
-
-[badges]
-travis-ci = { repository = "mockersf/jenkins-api.rs" }
 
 [dependencies]
 url = "2.2"
